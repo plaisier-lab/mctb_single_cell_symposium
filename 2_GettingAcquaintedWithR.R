@@ -1,24 +1,21 @@
-##########################################################
-## MCTB Single Cell Symposium: GettingAquaintedWithR.R  ##
-##  ______     ______     __  __                        ##
-## /\  __ \   /\  ___\   /\ \/\ \                       ##
-## \ \  __ \  \ \___  \  \ \ \_\ \                      ##
-##  \ \_\ \_\  \/\_____\  \ \_____\                     ##
-##   \/_/\/_/   \/_____/   \/_____/                     ##
-##                                                      ## 
-## @Course:  MCTB Single Cell Symposium                 ##
-## @Developed by: Plaisier Lab                          ##
-##   (https://plaisierlab.engineering.asu.edu/)         ##
-##   Arizona State University                           ##
-##   242 ISTB1, 550 E Orange St                         ##
-##   Tempe, AZ  85281                                   ##
-## @github: https://github.com/plaisier-lab/            ##
-## @Author:  Chris Plaisier                             ##
-## @License:  GNU GPLv3                                 ##
-##                                                      ##
-## If this program is used in your analysis please      ##
-## mention who built it. Thanks. :-)                    ##
-##########################################################
+############################################################
+## MCTB Single Cell Symposium: 2_GettingAcquaintedWithR.R ##
+##  __  __  ___ _____ ___                                 ##
+## |  \/  |/ __|_   _| _ )                                ##
+## | |\/| | (__  | | | _ \                                ##
+## |_|  |_|\___| |_| |___/                                ##
+##                                                        ##
+## @Course:  MCTB Single Cell Symposium                   ##
+## @Developed by: Plaisier Lab                            ##
+##   (https://plaisierlab.engineering.asu.edu/)           ##
+## @Developed by: Banovich Lab                            ##
+##   (https://www.banovichlab.org/)                       ##
+## @Authors:  Chris Plaisier and Nick Banovich            ##
+## @License:  GNU GPLv3                                   ##
+##                                                        ##
+## If this program is used in your analysis please        ##
+## mention who built it. Thanks. :-)                      ##
+############################################################
 
 # Set repositories
 setRepositories()
