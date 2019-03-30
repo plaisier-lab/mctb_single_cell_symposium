@@ -37,3 +37,5 @@ rsconnect/
 
 *.*~
 *.sw*
+.ipynb_checkpoints/GettingAquantedWithR-checkpoint.ipynb
+GettingAcquantedWithR.ipynb
