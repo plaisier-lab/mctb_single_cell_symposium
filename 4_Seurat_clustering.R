@@ -17,4 +17,7 @@
 ## mention who built it. Thanks. :-)                    ##
 ##########################################################
 
+# Find clusters
+lung1 = FindClusters(object = lung1, reduction.type = "pca", dims.use = 1:6, resolution = 0.3, print.output = 0, save.SNN = TRUE)
+TSNEPlot(lung1)
 
