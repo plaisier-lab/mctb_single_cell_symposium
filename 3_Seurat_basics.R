@@ -19,7 +19,7 @@
 
 # Import Seurat single cell analysis software
 library(Seurat)
-
+library(dplyr)
 # Set your working directory
 setwd('C:/Users/cplaisie/Dropbox (ASU)/mctb_single_cell_symposium_data')
 
@@ -86,6 +86,9 @@ lung1 = RunPCA(object = lung1, pc.genes = lung1@var.genes, pcs.compute = 40, pcs
 
 # Plot PCAs
 PCHeatmap(object = lung1, pc.use = 1:12, cells.use = 300, do.balanced = TRUE, label.columns = FALSE)
+
+# Pick number of PCs for downstream use
+PCElbowPlot(lung1)
 
 # Run TSNE
 lung1 = RunTSNE(object = lung1, dims.use = 1:6, do.fast = TRUE, perplexity = 30)
