@@ -54,7 +54,7 @@ TSNEPlot(lung1, group.by = "res.1")
 
 #Set chosen resolution as ident
 
-lung1 <- SetIdent(lung1, ident.use = lung1@meta.data$res.0.1)
+lung1=SetIdent(lung1, ident.use = lung1@meta.data$res.0.1)
 
 # Labeling clusters using known marker genes 
 FeaturePlot(lung1, c("EPCAM", "PTPRC", "PECAM1", "PDGFRB")) # Epithelial, Immune, Endothelial, Fibroblast
@@ -70,14 +70,32 @@ FeaturePlot(lung1, c("MUC5B", "FOXJ1")) # Secretory cells, cilliated cells
 DotPlot(lung1, c("PECAM1", "PDGFRB", "MUC5B", "FOXJ1", "CD14"))
 
 # Create new meta data column with cell type annotations using plyr
-current.cluster.ids <- c(0, 1, 2, 3, 4, 5, 6)
-new.cluster.ids <- c("Fibroblast", "Myeloid", "Myeloid", "Myeloid", 
+current.cluster.ids = c(0, 1, 2, 3, 4, 5, 6)
+new.cluster.ids = c("Fibroblast", "Myeloid", "Myeloid", "Myeloid", 
                      "Secretory", "Cilliated", "Endothelial")
-lung1@meta.data$celltype <- plyr::mapvalues(x = lung1@ident, from = current.cluster.ids, to = new.cluster.ids)
-lung1 <- SetIdent(lung1, ident.use = lung1@meta.data$celltype)
+lung1@meta.data$celltype=plyr::mapvalues(x = lung1@ident, from = current.cluster.ids, to = new.cluster.ids)
+lung1=SetIdent(lung1, ident.use = lung1@meta.data$celltype)
 TSNEPlot(lung1)
+DotPlot(lung1, c("PECAM1", "PDGFRB", "MUC5B", "FOXJ1", "CD14"))
 
+#Find genes with differntial expression between clusters
+lung_celltype_markers = FindMarkers(lung1, ident.1 = "Cilliated", ident.2 = "Secretory")
 
+head(lung_celltype_markers)
 
+# Use negbinom test rather than wilcox test
+lung_celltype_markers_negbinom = FindMarkers(lung1, ident.1 = "Cilliated", ident.2 = "Secretory", test.use = "negbinom")
 
+head(lung_celltype_markers_negbinom)
+
+# Look at the difference between two DE methods
+dim(lung_celltype_markers)
+dim(lung_celltype_markers_negbinom)
+
+# What genes are in the default method but not the negbinom
+dim(lung_celltype_markers[!(row.names(lung_celltype_markers) %in% row.names(lung_celltype_markers_negbinom)),])
+head(lung_celltype_markers[!(row.names(lung_celltype_markers) %in% row.names(lung_celltype_markers_negbinom)),])
+
+# What genes are in the negbinom but not the default
+dim(lung_celltype_markers_negbinom[!(row.names(lung_celltype_markers_negbinom) %in% row.names(lung_celltype_markers)),])
 
