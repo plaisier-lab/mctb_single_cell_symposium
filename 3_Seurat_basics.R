@@ -96,6 +96,7 @@ lung1 = RunPCA(object = lung1, pc.genes = lung1@var.genes, pcs.compute = 40, pcs
 # Plot PCAs
 PCHeatmap(object = lung1, pc.use = 1:12, cells.use = 300, do.balanced = TRUE, label.columns = FALSE)
 
+
 ########################
 ## Load up lung2 data ##
 ########################
