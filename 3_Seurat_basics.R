@@ -19,7 +19,7 @@
 
 # Import Seurat single cell analysis software
 library(Seurat)
-
+library(dplyr)
 # Set your working directory
 setwd('C:/Users/cplaisie/Dropbox (ASU)/mctb_single_cell_symposium_data')
 
@@ -119,4 +119,3 @@ lung2 = FindVariableGenes(object = lung2)
 lung2 = ScaleData(object = lung2, vars.to.regress = c('percent.mito','nUMI'), genes.use = lung2@var.genes, model.use = 'negbinom')
 lung2 = RunPCA(object = lung2, pc.genes = lung2@var.genes, pcs.compute = 40, pcs.print = 1:30, maxit = 500, weight.by.var = FALSE)
 PCHeatmap(object = lung2, pc.use = 1:12, cells.use = 300, do.balanced = TRUE, label.columns = FALSE)
-

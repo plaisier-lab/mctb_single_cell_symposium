@@ -1,3 +1,4 @@
+
 ##########################################################
 ## MCTB Single Cell Symposium: 6_Seurat_visualization.R ##
 ##  __  __  ___ _____ ___                               ##
@@ -17,4 +18,11 @@
 ## mention who built it. Thanks. :-)                    ##
 ##########################################################
 
+# Find all the differntially expressed genes between celltypes - using max.cells.per.ident to speed up for the workshop
+lung_celltype_markers = FindAllMarkers(lung1, max.cells.per.ident = 100)
 
+
+top10 <- lung_celltype_markers %>% group_by(cluster) %>% top_n(10, avg_logFC)
+
+VlnPlot(lung1, "KRT18")
+DoHeatmap(lung1, genes.use = head(row.names(lung_celltype_markers)))
