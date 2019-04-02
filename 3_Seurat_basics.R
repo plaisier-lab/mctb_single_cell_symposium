@@ -121,10 +121,24 @@ abline(h = 200, col = 'red', lwd = 2)
 plot(lung2@meta.data$percent_mito, lung2@meta.data$nGene, col=rgb(0,0,1,0.5), ylim = c(0,6000), xlim = c(0,0.35))
 abline(v = 0.2, col = 'red', lwd = 2)
 dim(lung2@data)
+
+# Filtering cells
+#  - nUMI >= 2000 UMI
+#  - percent_mito <= 0.2
 lung2 = FilterCells(object = lung2, subset.names = c("nUMI", "percent_mito"), low.thresholds = c(200, -Inf), high.thresholds = c(Inf, 0.2))
 dim(lung2@data)
+
+# Normalize lung2
 lung2 = NormalizeData(object = lung2)
+
+# Find the most variable genes in the dataset
 lung2 = FindVariableGenes(object = lung2)
+
+# Scale the data and regress out percent of mitochondrial and nUMI effects
 lung2 = ScaleData(object = lung2, vars.to.regress = c('percent_mito','nUMI'), genes.use = lung2@var.genes, model.use = 'negbinom')
+
+# Run PCA analysis
 lung2 = RunPCA(object = lung2, pc.genes = lung2@var.genes, pcs.compute = 40, pcs.print = 1:30, maxit = 500, weight.by.var = FALSE)
+
+# Plot PCAs
 PCHeatmap(object = lung2, pc.use = 1:12, cells.use = 300, do.balanced = TRUE, label.columns = FALSE)
