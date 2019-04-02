@@ -87,32 +87,15 @@ lung1 = RunPCA(object = lung1, pc.genes = lung1@var.genes, pcs.compute = 40, pcs
 # Plot PCAs
 PCHeatmap(object = lung1, pc.use = 1:12, cells.use = 300, do.balanced = TRUE, label.columns = FALSE)
 
-# Run TSNE
-lung1 = RunTSNE(object = lung1, dims.use = 1:6, do.fast = TRUE, perplexity = 30)
-TSNEPlot(lung1)
-
-# Find clusters
-lung1 = FindClusters(object = lung1, reduction.type = "pca", dims.use = 1:6, resolution = 0.3, print.output = 0, save.SNN = TRUE)
-TSNEPlot(lung1)
-
-# Find all marker genes
-lung1.markers = FindAllMarkers(object = lung1, only.pos = TRUE, min.pct = 0.25, thresh.use = 0.25)
-lung1.markers %>% group_by(cluster) %>% top_n(5, avg_logFC)
-write.csv(lung1.markers,'lung1.markers.csv')
-
-# Build classifier for clusters - 
-lung1.rf_mg = BuildRFClassifier(object = lung1, training.genes = (lung1.markers %>% group_by(cluster) %>% top_n(100, avg_logFC))$gene, training.classes = lung1@ident)
-lung1.rf_mg
-
-lung1.rf = BuildRFClassifier(object = lung1, training.genes = lung1@var.genes, training.classes = lung1@ident)
-lung1.rf
-
-
 ########################
 ## Load up lung2 data ##
 ########################
 lung2_counts = Read10X(data.dir = "Lung2/outs/filtered_gene_bc_matrices/GRCh38/")
 lung2 = CreateSeuratObject(raw.data = lung2_counts)
+
+# Select mitochondrial genes - mitochondria (MT) have a double membrane, their own genome, and transcriptases.
+# Ratio of MT genes to general cell genes is a great way to assess cell integrity as MT genes will have a harder
+# time escaping the cell if the membrane is compromised.
 mito.genes = grep(pattern = "^MT-", x = rownames(x = lung2@data), value = TRUE)
 percent.mito = colSums(lung2@data[mito.genes, ]) / colSums(lung2@data)
 lung2 = AddMetaData(object = lung2, metadata = percent.mito, col.name = "percent.mito")
@@ -135,18 +118,5 @@ lung2 = NormalizeData(object = lung2)
 lung2 = FindVariableGenes(object = lung2)
 lung2 = ScaleData(object = lung2, vars.to.regress = c('percent.mito','nUMI'), genes.use = lung2@var.genes, model.use = 'negbinom')
 lung2 = RunPCA(object = lung2, pc.genes = lung2@var.genes, pcs.compute = 40, pcs.print = 1:30, maxit = 500, weight.by.var = FALSE)
-
 PCHeatmap(object = lung2, pc.use = 1:12, cells.use = 300, do.balanced = TRUE, label.columns = FALSE)
-
-# Apply classifier
-#lung1 = FindClusters(object = lung1, reduction.type = "pca", dims.use = 1:6, resolution = 0.3, print.output = 0, save.SNN = TRUE)
-clusts.lung2 = ClassifyCells(object = lung2, classifier = lung1.rf,new.data = lung2@data)
-names(clusts.lung2) = colnames(lung2@data)
-lung2 = AddMetaData(object = lung2, metadata = clusts.lung2, col.name = "clusts_lung1")
-table(lung2@meta.data$clusts_lung1)
-lung2 = SetAllIdent(object = lung2, id='clusts_lung1')
-
-# Plot with lung1 clusters overlaid
-lung2 = RunTSNE(object = lung2, dims.use = 1:8, do.fast = TRUE, perplexity = 30)
-TSNEPlot(lung2)
 
