@@ -94,7 +94,7 @@ table(celltype_lung1_myeloid)
 # Label the cell type classifications
 names(celltype_lung1_myeloid) = colnames(lung1_myeloid@data)
 
-# Update main lung2
+# Update main lung1
 celltype_lung1_w_myeloid = as.character(lung1@meta.data$celltype)
 names(celltype_lung1_w_myeloid) = rownames(lung1@meta.data)
 
@@ -113,6 +113,9 @@ lung1 = SetAllIdent(object = lung1, id='celltype_w_myeloid')
 # Plot TSNE
 TSNEPlot(lung1, do.label=T)
 
+# Dotplot of lung1 
+DotPlot(lung1, c("PECAM1", "PDGFRB", "MUC5B", "FOXJ1", "CD14", "CD3E", "MS4A1"), x.lab.rot = 2)
+
 ## lung2 PBMC classification
 # Subset data so we only classify myeloid cells
 lung2_myeloid = SubsetData(object = lung2, cells.use = rownames(lung2@meta.data)[which(lung2@meta.data$celltype=='Myeloid')])
@@ -122,6 +125,9 @@ celltype_lung2_myeloid = ClassifyCells(object = lung2_myeloid, classifier = pbmc
 
 # What is the breakdown of PBMC cell types found in lung2
 table(celltype_lung2_myeloid)
+
+# Label the cell type classifications
+names(celltype_lung2_myeloid) = colnames(lung2_myeloid@data)
 
 # Update main lung2
 celltype_lung2_w_myeloid = as.character(celltype_lung2)
@@ -140,4 +146,7 @@ table(lung2@meta.data$celltype_w_myeloid)
 lung2 = SetAllIdent(object = lung2, id='celltype_w_myeloid')
 
 # Plot TSNE
-TSNEPlot(lung2, do.label=T)
+TSNEPlot(lung2, do.label=F)
+
+# Dotplot of lung2
+DotPlot(lung2, c("PECAM1", "PDGFRB", "MUC5B", "FOXJ1", "CD14", "CD3E", "MS4A1"), x.lab.rot = 2)
