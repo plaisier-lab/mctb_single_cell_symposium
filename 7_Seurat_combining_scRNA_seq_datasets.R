@@ -85,3 +85,35 @@ table(lungs@ident)
 lungs@data[1:10,1:30]
 
 lungs_CCA@data[1:10,1:30]
+
+# Look at the secretory cells in more depth
+secretory_lungs = SubsetData(lungs, cells.use = row.names(lungs@meta.data[lungs@meta.data$celltype_w_myeloid == "Secretory",]))
+
+# Featureplots of markers for Type 2 airway epithelial cells, club cells and type 1 airway epithelial cells
+FeaturePlot(secretory_lungs, c("SFTPC", "SCGB3A1", "AGER", "HOPX") )
+
+# Find clusters
+secretory_lungs = FindClusters(secretory_lungs, reduction.type = "pca", dims.use = 1:20, resolution = .1)
+
+TSNEPlot(secretory_lungs)
+
+# Rename the cells into more granual celltypes
+secretory_lungs@meta.data[secretory_lungs@meta.data$res.0.1 == 0,]$celltype_w_myeloid <- "Club cells" 
+secretory_lungs@meta.data[secretory_lungs@meta.data$res.0.1 == 1,]$celltype_w_myeloid <- "AT1" 
+secretory_lungs@meta.data[secretory_lungs@meta.data$res.0.1 == 2,]$celltype_w_myeloid <- "AT2" 
+
+TSNEPlot(secretory_lungs, group.by = "celltype_w_myeloid")
+
+# Update secretory cells in final object
+celltype_lungs= as.character(lungs@meta.data$celltype_w_myeloid)
+names(celltype_lungs) = rownames(lungs@meta.data)
+celltype_lungs[colnames(secretory_lungs@data)] = as.character(secretory_lungs@meta.data$celltype_w_myeloid)
+
+# check that all cell types are here
+table(celltype_lungs)
+
+# Update the meta.data in the lungs object
+lungs@meta.data$celltype_final <- celltype_lungs
+
+# TSNEplot
+TSNEPlot(lungs, group.by = "celltype_final")
