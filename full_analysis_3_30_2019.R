@@ -19,10 +19,11 @@
 
 # Import Seurat single cell analysis software
 library(Seurat)
+library(dplyr)
 
 # Set your working directory
-#setwd('C:/Users/cplaisie/Dropbox (ASU)/mctb_single_cell_symposium_data')
-setwd('C:/Users/plais/Dropbox (ASU)/mctb_single_cell_symposium_data')
+setwd('C:/Users/cplaisie/Dropbox (ASU)/mctb_single_cell_symposium_data')
+#setwd('C:/Users/plais/Dropbox (ASU)/mctb_single_cell_symposium_data')
 
 # Load up data
 lung1_counts = Read10X(data.dir = "Lung1/outs/filtered_gene_bc_matrices/GRCh38/")
@@ -88,12 +89,20 @@ lung1 = RunPCA(object = lung1, pc.genes = lung1@var.genes, pcs.compute = 40, pcs
 # Plot PCAs
 PCHeatmap(object = lung1, pc.use = 1:12, cells.use = 300, do.balanced = TRUE, label.columns = FALSE)
 
-# Run TSNE
-lung1 = RunTSNE(object = lung1, dims.use = 1:6, do.fast = TRUE, perplexity = 30)
+# Run TSNE using PCs 1:10 with perplexity of 100
+lung1 = RunTSNE(object = lung1, dims.use = 1:10, do.fast = TRUE, perplexity = 100)
 TSNEPlot(lung1)
 
 # Find clusters
-lung1 = FindClusters(object = lung1, reduction.type = "pca", dims.use = 1:6, resolution = 0.3, print.output = 0, save.SNN = TRUE)
+lung1 = FindClusters(object = lung1, dims.use = 1:10, reduction.type = "pca", resolution = 0.1, print.output = 0, save.SNN  = TRUE)
+TSNEPlot(lung1)
+
+# Create new meta data column with cell type annotations using plyr
+current.cluster.ids = c(0, 1, 2, 3, 4, 5, 6)
+new.cluster.ids = c("Fibroblast", "Myeloid", "Myeloid", "Myeloid",
+                     "Secretory", "Cilliated", "Endothelial")
+lung1@meta.data$celltype = plyr::mapvalues(x = lung1@ident, from = current.cluster.ids, to = new.cluster.ids)
+lung1 = SetIdent(lung1, ident.use = lung1@meta.data$celltype)
 TSNEPlot(lung1)
 
 # Find all marker genes
@@ -101,12 +110,12 @@ lung1.markers = FindAllMarkers(object = lung1, only.pos = TRUE, min.pct = 0.25, 
 lung1.markers %>% group_by(cluster) %>% top_n(5, avg_logFC)
 write.csv(lung1.markers,'lung1.markers.csv')
 
-# Build classifier for clusters - 
-lung1.rf_mg = BuildRFClassifier(object = lung1, training.genes = (lung1.markers %>% group_by(cluster) %>% top_n(100, avg_logFC))$gene, training.classes = lung1@ident)
-lung1.rf_mg
+# Build classifier for clusters -
+#lung1_rf_mg = BuildRFClassifier(object = lung1, training.genes = (lung1.markers %>% #group_by(cluster) %>% top_n(100, avg_logFC))$gene, training.classes = lung1@ident)
+#lung1_rf_mg
 
-lung1.rf = BuildRFClassifier(object = lung1, training.genes = lung1@var.genes, training.classes = lung1@ident)
-lung1.rf
+lung1_rf = BuildRFClassifier(object = lung1, training.genes = lung1@var.genes, training.classes = lung1@ident)
+lung1_rf
 
 
 ########################
@@ -143,13 +152,33 @@ PCHeatmap(object = lung2, pc.use = 1:12, cells.use = 300, do.balanced = TRUE, la
 #lung1 = FindClusters(object = lung1, reduction.type = "pca", dims.use = 1:6, resolution = 0.3, print.output = 0, save.SNN = TRUE)
 clusts_lung2 = ClassifyCells(object = lung2, classifier = lung1_rf,new.data = lung2@data)
 names(clusts_lung2) = colnames(lung2@data)
+
 lung2 = AddMetaData(object = lung2, metadata = clusts_lung2, col.name = "clusts_lung1")
 table(lung2@meta.data$clusts_lung1)
 lung2 = SetAllIdent(object = lung2, id='clusts_lung1')
-
 # Plot with lung1 clusters overlaid
-lung2 = RunTSNE(object = lung2, dims.use = 1:8, do.fast = TRUE, perplexity = 30)
+lung2 = RunTSNE(object = lung2, dims.use = 1:8, do.fast = TRUE, perplexity = 100)
+
 TSNEPlot(lung2)
+
+# Subset data based on myeloid cell types
+lung2_myeloid = SubsetData(object = lung2, cells.use=rownames(lung2@meta.data)[which(lung2@meta.data$clusts_lung1=='Myeloid')])
+clusts_lung2_myeloid = ClassifyCells(object = lung2_myeloid, classifier = pbmc_rf, new.data = lung2_myeloid@data)
+names(clusts_lung2_myeloid) = colnames(lung2_myeloid@data)
+lung2_myeloid = AddMetaData(object = lung2_myeloid, metadata = clusts_lung2_myeloid, col.name = "clusts_pbmc")
+table(lung2_myeloid@meta.data$clusts_pbmc)
+lung2_myeloid = SetAllIdent(object = lung2, id='clusts_pbmc')
+
+# Update main lung2
+clusts_lung2_w_myeloid = as.character(clusts_lung2)
+names(clusts_lung2_w_myeloid) = names(clusts_lung2)
+clusts_lung2_w_myeloid[names(clusts_lung2_myeloid)] = as.character(clusts_lung2_myeloid)
+
+lung2 = AddMetaData(object = lung2, metadata = clusts_lung2_w_myeloid, col.name = "clusts_lung1_w_myeloid")
+table(lung2@meta.data$clusts_lung1_w_myeloid)
+lung2 = SetAllIdent(object = lung2, id='clusts_lung1_w_myeloid')
+TSNEPlot(lung2)
+
 
 
 ##########################################################
@@ -167,10 +196,10 @@ mouse_lung = AddMetaData(object = mouse_lung, metadata = sapply(colnames(mouse_l
 
 mouse_lung.markers = FindAllMarkers(object = mouse_lung, only.pos = TRUE, min.pct = 0.25, thresh.use = 0.25)
 
-# Build classifier for clusters - 
+# Build classifier for clusters -
+
 mouse_lung.rf = BuildRFClassifier(object = mouse_lung, training.genes = mouse_lung@var.genes, training.classes = mouse_lung@meta.data$cell_type)
 mouse_lung.rf
-
 # Convert from mouse gene symbols to human gene symbols
 library(biomaRt)
 human = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
@@ -178,7 +207,7 @@ mouse = useMart("ensembl", dataset = "mmusculus_gene_ensembl")
 genes = mouse_lung.rf$forest$independent.variable.names
 genes = getLDS(attributes = c("mgi_symbol"), filters = "mgi_symbol", values = genes ,mart = mouse, attributesL = c("hgnc_symbol","chromosome_name", "start_position"), martL = human, uniqueRows=T)
 
-# 
+#
 tmp = genes[,'MGI.symbol']
 names(tmp) = genes[,'HGNC.symbol']
 common_names = intersect(genes[,'HGNC.symbol'], rownames(lung1@data))
@@ -192,3 +221,26 @@ table(lung1@meta.data$cell_types_lung1)
 lung1 = SetAllIdent(object = lung1, id='cell_types_lung1')
 TSNEPlot(lung1)
 
+################################
+## Load PBMC data 3k from 10X ##
+################################
+
+# Load the PBMC dataset
+pbmc.data = Read10X(data.dir = "pbmc3k_filtered_gene_bc_matrices/filtered_gene_bc_matrices/hg19/")
+pbmc = CreateSeuratObject(raw.data = pbmc.data, min.cells = 3, min.genes = 200, project = "10X_PBMC")
+mito_genes = grep(pattern = "^MT-", x = rownames(x = pbmc@data), value = TRUE)
+percent_mito = Matrix::colSums(pbmc@raw.data[mito_genes, ])/Matrix::colSums(pbmc@raw.data)
+pbmc = AddMetaData(object = pbmc, metadata = percent_mito, col.name = "percent_mito")
+pbmc = FilterCells(object = pbmc, subset.names = c("nGene", "percent_mito"), low.thresholds = c(200, -Inf), high.thresholds = c(2500, 0.05))
+pbmc = NormalizeData(object = pbmc, normalization.method = "LogNormalize", scale.factor = 10000)
+pbmc = FindVariableGenes(object = pbmc, mean.function = ExpMean, dispersion.function = LogVMR, x.low.cutoff = 0.0125, x.high.cutoff = 3, y.cutoff = 0.5)
+pbmc = ScaleData(object = pbmc, vars.to.regress = c("nUMI", "percent_mito"))
+pbmc = RunPCA(object = pbmc, pc.genes = pbmc@var.genes, do.print = TRUE, pcs.print = 1:5, genes.print = 5)
+pbmc = FindClusters(object = pbmc, reduction.type = "pca", dims.use = 1:10, resolution = 0.6, print.output = 0, save.SNN = TRUE)
+current.cluster.ids <- c(0, 1, 2, 3, 4, 5, 6, 7)
+new.cluster.ids <- c("CD4 T cells", "CD14+ Monocytes", "B cells", "CD8 T cells", "FCGR3A+ Monocytes", "NK cells", "Dendritic cells", "Megakaryocytes")
+pbmc@ident <- plyr::mapvalues(x = pbmc@ident, from = current.cluster.ids, to = new.cluster.ids)
+pbmc = RunTSNE(object = pbmc, dims.use = 1:10, do.fast = TRUE)
+TSNEPlot(object = pbmc, do.label = TRUE, pt.size = 0.5)
+pbmc_rf = BuildRFClassifier(object = pbmc, training.genes = pbmc@var.genes, training.classes = pbmc@ident)
+pbmc_rf
