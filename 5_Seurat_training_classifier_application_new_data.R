@@ -113,6 +113,9 @@ lung1 = SetAllIdent(object = lung1, id='celltype_w_myeloid')
 # Plot TSNE
 TSNEPlot(lung1, do.label=T)
 
+# Dotplot of lung1 
+DotPlot(lung1, c("PECAM1", "PDGFRB", "MUC5B", "FOXJ1", "CD14", "CD3E", "MS4A1"), x.lab.rot = 2)
+
 ## lung2 PBMC classification
 # Subset data so we only classify myeloid cells
 lung2_myeloid = SubsetData(object = lung2, cells.use = rownames(lung2@meta.data)[which(lung2@meta.data$celltype=='Myeloid')])
@@ -145,3 +148,6 @@ lung2 = SetAllIdent(object = lung2, id='celltype_w_myeloid')
 
 # Plot TSNE
 TSNEPlot(lung2, do.label=T)
+
+# Dotplot of lung2
+DotPlot(lung2, c("PECAM1", "PDGFRB", "MUC5B", "FOXJ1", "CD14", "CD3E", "MS4A1"), x.lab.rot = 2)
