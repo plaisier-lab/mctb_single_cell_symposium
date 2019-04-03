@@ -75,6 +75,7 @@ pbmc_rf
 save(pbmc_rf, file = 'pbmc_rf.RData')
 
 # WE COULD JUST LOAD THE pbmc_rf AS A PRECOMPUTED CLASSIFIER WITH THE ABOVE CODE IN A SEPARATE SUPPLEMENTARY FILE
+load('pbmc_rf.RData')
 
 ## lung1 PBMC classification
 # Subset data so we only classify myeloid cells
