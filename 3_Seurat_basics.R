@@ -37,7 +37,7 @@ colnames(lung1_counts)[1:10]
 rownames(lung1_counts)[1:10]
 
 # Create Seurat object
-lung1 = CreateSeuratObject(raw.data = lung1_counts)
+lung1 = CreateSeuratObject(raw.data = lung1_counts, project = "lung1")
 
 # Structure of a Seurat object
 str(lung1)
@@ -88,7 +88,7 @@ lung1 = FindVariableGenes(object = lung1)
 length(lung1@var.genes)
 
 # Scale the data and regress out percent of mitochondrial and nUMI effects
-lung1 = ScaleData(object = lung1, vars.to.regress = c('percent_mito','nUMI'), genes.use = lung1@var.genes, model.use = 'negbinom')
+lung1 = ScaleData(object = lung1, vars.to.regress = c('percent_mito','nUMI'), genes.use = lung1@var.genes)
 
 # Run PCA analysis
 lung1 = RunPCA(object = lung1, pc.genes = lung1@var.genes, pcs.compute = 40, pcs.print = 1:30, maxit = 500, weight.by.var = FALSE)
@@ -101,7 +101,7 @@ PCHeatmap(object = lung1, pc.use = 1:12, cells.use = 300, do.balanced = TRUE, la
 ## Load up lung2 data ##
 ########################
 lung2_counts = Read10X(data.dir = "Lung2/outs/filtered_gene_bc_matrices/GRCh38/")
-lung2 = CreateSeuratObject(raw.data = lung2_counts)
+lung2 = CreateSeuratObject(raw.data = lung2_counts, project = "lung2")
 
 # Select mitochondrial genes - mitochondria (MT) have a double membrane, their own genome, and transcriptases.
 # Ratio of MT genes to general cell genes is a great way to assess cell integrity as MT genes will have a harder
@@ -136,7 +136,7 @@ lung2 = NormalizeData(object = lung2)
 lung2 = FindVariableGenes(object = lung2)
 
 # Scale the data and regress out percent of mitochondrial and nUMI effects
-lung2 = ScaleData(object = lung2, vars.to.regress = c('percent_mito','nUMI'), genes.use = lung2@var.genes, model.use = 'negbinom')
+lung2 = ScaleData(object = lung2, vars.to.regress = c('percent_mito','nUMI'), genes.use = lung2@var.genes)
 
 # Run PCA analysis
 lung2 = RunPCA(object = lung2, pc.genes = lung2@var.genes, pcs.compute = 40, pcs.print = 1:30, maxit = 500, weight.by.var = FALSE)

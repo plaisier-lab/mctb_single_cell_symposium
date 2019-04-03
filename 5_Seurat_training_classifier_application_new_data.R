@@ -26,7 +26,7 @@ lung1_rf
 lung1_rf$confusion.matrix
 
 # Calculate predictive value of classifier
-confusion1 = tb.rf$confusion[c(2,1),c(2,1)]
+confusion1 = lung1_rf$confusion[c(2,1),c(2,1)]
 
 # Run classifier on lung2 dataset
 celltype_lung2 = ClassifyCells(object = lung2, classifier = lung1_rf,new.data = lung2@data)

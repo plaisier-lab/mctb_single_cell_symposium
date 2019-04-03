@@ -98,3 +98,4 @@ head(lung_celltype_markers[!(row.names(lung_celltype_markers) %in% row.names(lun
 
 # What genes are in the negbinom but not the default
 dim(lung_celltype_markers_negbinom[!(row.names(lung_celltype_markers_negbinom) %in% row.names(lung_celltype_markers)),])
+
