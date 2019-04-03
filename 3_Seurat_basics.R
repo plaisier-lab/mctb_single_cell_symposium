@@ -22,7 +22,8 @@ library(Seurat)
 library(dplyr)
 
 # Set your working directory
-setwd('C:/Users/cplaisie/Dropbox (ASU)/mctb_single_cell_symposium_data')
+#setwd('C:/Users/cplaisie/Dropbox (ASU)/mctb_single_cell_symposium_data')
+setwd('C:/Users/plais/Dropbox (ASU)/mctb_single_cell_symposium_data')
 
 ########################
 ## Load up lung1 data ##
