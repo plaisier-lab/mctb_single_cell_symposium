@@ -65,7 +65,7 @@ endothelial_disease_markers = FindMarkers(endothelial_lungs, ident.1 = "lung1", 
 fibroblast_disease_markers = FindMarkers(fibroblast_lungs, ident.1 = "lung1", ident.2 = "lung3")
 
 # View top 5 disease most UPREGULATED genes in diseased lungs for each cell type with split dot plot
-top5_disease = c(head(rownames(clubcell_disease_markers[order(clubcell_disease_markers$avg_logFC),]), 5), head(rownames(endothelial_disease_markers[order(endothelial_disease_markers$avg_logFC),]), 5), head(rownames(fibroblast_disease_markers[order(fibroblast_disease_markers$avg_logFC),]), 5))
+top5_disease = c(head(rownames(clubcell_disease_markers[order(clubcell_disease_markers$avg_logFC),]), 7), head(rownames(endothelial_disease_markers[order(endothelial_disease_markers$avg_logFC),]), 7), head(rownames(fibroblast_disease_markers[order(fibroblast_disease_markers$avg_logFC),]), 7))
 
 # Look for duplicated values
 table(top5_disease)
@@ -73,18 +73,30 @@ table(top5_disease)
 # Remove the duplicates
 top5_disease = unique(top5_disease)
 
-# Visualization of DE genes across all cells with SplitDotPlot
-SplitDotPlotGG(lungs, genes.plot = top5_disease, grouping.var = "orig.ident", group.by = "celltype_final", x.lab.rot = 2, plot.legend = T)
-
-# Visualization of DE genes in fibroblasts with SplitDotPlot
-SplitDotPlotGG(endothelial_lungs, genes.plot = top5_disease, grouping.var = "orig.ident", group.by = "celltype_final", x.lab.rot = 2, plot.legend = T)
-
 # Look at featureplot of these genes
 FeaturePlot(lungs, top5_disease)
 TSNEPlot(lungs)
 
-# Look at a featureplot of these genes just in secretory cells
+# Look at featureheatmap 
+FeatureHeatmap(lungs, head(top5_disease), group.by = "orig.ident", max.exp = 5)
+
+
+# Visualization of DE genes across all cells with SplitDotPlot
+SplitDotPlotGG(lungs, genes.plot = top5_disease, grouping.var = "orig.ident", group.by = "celltype_final", x.lab.rot = 2, plot.legend = T)
+
+# Visualization of DE genes in clubcells with SplitDotPlot
+SplitDotPlotGG(clubcell_lungs, genes.plot = top5_disease, grouping.var = "orig.ident", group.by = "celltype_final", x.lab.rot = 2, plot.legend = T)
+
+
+# Look at a featureplot of DE genes in just secretory cells
 FeaturePlot(secretory_lungs, top5_disease)
+secretory_lungs = SetAllIdent(secretory_lungs, id = "celltype_w_myeloid")
 TSNEPlot(secretory_lungs)
 
+# What would the DE genes look like if we hadn't broken down the secretory cell types earier
+secretory_lungs = SetAllIdent(secretory_lungs, id = "orig.ident")
+secretory_disease_markers = FindMarkers(secretory_lungs, ident.1 = "lung1", ident.2 = "lung3")
+
+# Look at the featureplot of top DE genes
+FeaturePlot(secretory_lungs, tail(row.names(secretory_disease_markers[order(abs(secretory_disease_markers$avg_logFC)),]))) # Driven mostly by cell type differences between samples
 
