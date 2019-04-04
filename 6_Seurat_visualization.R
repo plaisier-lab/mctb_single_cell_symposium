@@ -54,6 +54,9 @@ lung_disease_markers = FindMarkers(lungs, ident.1 = "lung1", ident.2 = "lung3")
 
 VlnPlot(lungs, tail(rownames(lung_disease_markers[order(abs(lung_disease_markers$avg_logFC)),]), 10))
 
+# Look at these genes with a feature plot.
+FeaturePlot(lungs, tail(rownames(lung_disease_markers[order(abs(lung_disease_markers$avg_logFC)),]), 10))
+
 # Identify cell type specific DE genes for secretory, cilliated, and fibroblast cells.
 
 clubcell_lungs = SubsetData(lungs, cells.use = row.names(lungs@meta.data[lungs@meta.data$celltype_final == "Club cells",]))
