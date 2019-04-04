@@ -1,6 +1,6 @@
 
 ##########################################################
-## MCTB Single Cell Symposium: 6_Seurat_visualization.R ##
+## MCTB Single Cell Symposium: 7_Seurat_visualization.R ##
 ##  __  __  ___ _____ ___                               ##
 ## |  \/  |/ __|_   _| _ )                              ##
 ## | |\/| | (__  | | | _ \                              ##

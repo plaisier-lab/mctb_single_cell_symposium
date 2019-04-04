@@ -1,6 +1,6 @@
 ##########################################################
 ## MCTB Single Cell Symposium:                          ##
-##     7_Seurat_combining_scRNA_seq_datasets.R          ##
+##     6_Seurat_combining_scRNA_seq_datasets.R          ##
 ##  __  __  ___ _____ ___                               ##
 ## |  \/  |/ __|_   _| _ )                              ##
 ## | |\/| | (__  | | | _ \                              ##
@@ -98,9 +98,9 @@ secretory_lungs = FindClusters(secretory_lungs, reduction.type = "pca", dims.use
 TSNEPlot(secretory_lungs)
 
 # Rename the cells into more granual celltypes
-secretory_lungs@meta.data[secretory_lungs@meta.data$res.0.1 == 0,]$celltype_w_myeloid <- "Club cells" 
-secretory_lungs@meta.data[secretory_lungs@meta.data$res.0.1 == 1,]$celltype_w_myeloid <- "AT1" 
-secretory_lungs@meta.data[secretory_lungs@meta.data$res.0.1 == 2,]$celltype_w_myeloid <- "AT2" 
+secretory_lungs@meta.data[secretory_lungs@meta.data$res.0.1 == 0,]$celltype_w_myeloid <- "Club cells"
+secretory_lungs@meta.data[secretory_lungs@meta.data$res.0.1 == 1,]$celltype_w_myeloid <- "AT1"
+secretory_lungs@meta.data[secretory_lungs@meta.data$res.0.1 == 2,]$celltype_w_myeloid <- "AT2"
 
 TSNEPlot(secretory_lungs, group.by = "celltype_w_myeloid")
 
