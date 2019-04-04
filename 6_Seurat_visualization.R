@@ -27,7 +27,7 @@ lung_celltype_markers = FindAllMarkers(lungs, max.cells.per.ident = 100, min.cel
 # This uses dplyr to pull the top 20 DE genes from each cell-type based on absolute value of the avg_logFC
 top20 = lung_celltype_markers %>% group_by(cluster) %>% top_n(20, abs(avg_logFC))
 
-# Make a heatmap of these genes 
+# Make a heatmap of these genes
 DoHeatmap(lungs, genes.use = top20$gene)
 
 # View the heatmap options
@@ -80,7 +80,7 @@ top5_disease = unique(top5_disease)
 FeaturePlot(lungs, top5_disease)
 TSNEPlot(lungs)
 
-# Look at featureheatmap 
+# Look at featureheatmap
 FeatureHeatmap(lungs, head(top5_disease), group.by = "orig.ident", max.exp = 5)
 
 
@@ -102,4 +102,3 @@ secretory_disease_markers = FindMarkers(secretory_lungs, ident.1 = "lung1", iden
 
 # Look at the featureplot of top DE genes
 FeaturePlot(secretory_lungs, tail(row.names(secretory_disease_markers[order(abs(secretory_disease_markers$avg_logFC)),]))) # Driven mostly by cell type differences between samples
-
